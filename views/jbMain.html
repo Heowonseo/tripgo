@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset= "UTF-8">
+		<title>JBP</title>
+		<link rel="stylesheet" href="/hapdong.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script type="text/JavaScript" src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+	</head>
+	<body>
+		<div class="main-top">
+			<p class="main-top-p">
+			JB-Platform
+			</p>
+		</div>
+		<div class="main-body">
+			<img src="https://millim.s3.ap-northeast-2.amazonaws.com/jb/car.png">
+		</div>
+		<div class="main-bottom">
+			<button type="button" onclick="location.href='/yacol'">콜택시</button>
+			<button type="button" onclick="location.href='/hapdong'">합동</button>
+			<button type="button" onclick="checkPass()">분대장 전용</button>
+		</div>
+		<script>
+			function checkPass(){
+				var inputPass = prompt('비밀번호 입력하세요');
+				if(inputPass == '4184'){
+					location.href='/check';
+					return;
+				}else{
+					alert('올바르지 않은 비밀번호입니다.');
+					return;
+				}
+			}
+		</script>
+	</body>
+</html>

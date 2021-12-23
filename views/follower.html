@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="fllow-container">
+	<div id="followList">
+		{% if exUser.Followers.length != 0 %}
+        {% for follower in exUser.Followers %}
+          <div id="followElement">
+			   <div class="followElement-user">
+				   <img class="follow-img"src="{{follower.profileImg}}"><p onclick="location.href='/user?i={{follower.id}}'">{{follower.nick}}</p>
+			  </div>
+			  <div class="followElement-btn">
+				  <button>
+						삭제
+					</button>
+			
+			  </div>
+			
+		</div>
+        {% endfor %}
+	  {% else %}
+		<div class="alertFollow">
+		  	<h1>
+				아직 {{user.nick}}님을 팔로우한 유저가 없어요!
+			</h1>
+		</div>
+      {% endif %}
+	</div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+
+{% endblock %}

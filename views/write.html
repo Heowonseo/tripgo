@@ -1,0 +1,332 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="write-container">
+	<div class="search-part-write" id="search-part">
+		<input type="text" id="keyword" oninput="able()" placeholder="#검색어" onkeyup="enterkey()" >
+					<button type="button" id="searchbtn" onclick="searchPlaces()" disabled><i class="fas fa-search fa-lg  "></i></button>
+	</div>
+	<div id="selectedInfo"></div>
+	<div id="map" style="width:100%;height:350px;margin:20px 0px;"></div>
+	<div id="placesList"></div>
+	
+	<form method="POST" action="/post/write" enctype="multipart/form-data" id="frm">
+		<div class="review-photo" id="upload-part" style="margin-bottom:20px;display:none;">
+			 <input id="shopId" type="hidden" name="ShopId">
+			 <div class="img-preview"></div>
+			 <label for="uploadbtn">사진 업로드</label>
+			 <input type="file" oninput="ableUpload()" id="uploadbtn" name="img" accept="image/*" multiple>
+		</div>
+		<div class="point-part" id="point-part" style="display:none;">
+			<progress max='5' value="0" id="bar"></progress>
+			<input type="number" id="point" name="point" max='5' min='0' onchange="pointChange(this.value)" oninput="ableWrite()">
+			<button type="button" id="suby3" disabled onclick="showReview()">완료</button>
+		</div>
+		<div class="review-content" id="review-part" style="display:none;">
+			<textarea id="review" name="review" oninput="ables()" placeholder="리뷰"></textarea>
+			<button type="button" id="suby2" onclick="change()" disabled >완료</button>
+		</div>
+	</form>
+</div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d5551822d523c32a727c9565bfcb3814&libraries=services"></script>
+{% endblock %}
+
+
+{% block script %}
+<script>
+function change(){
+	var text = document.getElementById('review').value;
+	text = text.replace(/(?:\r\n|\r|\n)/g, ' <br>');
+	document.getElementById('review').value = text;
+	document.getElementById('frm').submit();
+}
+</script>
+<script>
+    if (document.getElementById("uploadbtn")) {
+  let uploadNum = 0; //올린 사진 셀 변수
+  let index = 0; //img 에 붙일 index
+  document.getElementById("uploadbtn").addEventListener("change", function (e) {
+    const formData = new FormData(); //서버로 보낼 이미지 form
+    const length = this.files.length;
+    const max = 5; //사진 최대 4장까지
+    switch (uploadNum) {
+      case 0:
+        if (length > max - uploadNum) {
+          alert("사진은 최대 5장까지만 가능합니다.");
+          return;
+        }
+        uploadNum += length;
+        break;
+      case 1:
+        if (length > max - uploadNum) {
+          alert("사진은 최대 5장까지만 가능합니다.");
+          return;
+        }
+        uploadNum += length;
+        break;
+      case 2:
+        if (length > max - uploadNum) {
+          alert("사진은 최대 5장까지만 가능합니다.");
+          return;
+        }
+        uploadNum += length;
+        break;
+      case 3:
+        if (length > max - uploadNum) {
+          alert("사진은 최대 5장까지만 가능합니다.");
+          return;
+        }
+        uploadNum += length;
+        break;
+	  case 4:
+        if (length > max - uploadNum) {
+          alert("사진은 최대 5장까지만 가능합니다.");
+          return;
+        }
+        uploadNum += length;
+        break;
+      default:
+        alert("사진은 최대 5장까지만 가능합니다.");
+        return;
+    }
+    console.log("업로드한 사진 : ", uploadNum);
+    console.log("현재 올린 사진 : ", this.files);
+    for (let i = 0; i < length; i++) {
+      formData.append("img", this.files[i]);
+      index++;
+    }
+    axios.post("/post/img", formData).then((res) => {
+      let url = JSON.parse(res.data);
+      console.log(url);
+      let img_html = "";
+      for (let i = 0; i < url.length; i++) {
+        console.log("미리보기", url[i]);
+        img_html += `<div class="img-preview${index}">
+                  <img id="img-preview${index}" src="${url[i]}" width="250" alt="미리보기">
+				  <input id="img-url" type="hidden" name="url" value="${url[i]}">
+                  </div>`;
+        console.log("json 길이 : ", url.length);
+        console.log("서버통신index:", index);
+        console.log(img_html);
+      }
+      $(".img-preview").append(img_html);
+    });
+  });
+}
+</script>
+<script>
+	const suby1 = document.getElementById('suby1');
+	const suby2 = document.getElementById('suby2');
+	const suby3 = document.getElementById('suby3');
+	const review = document.getElementById('review');
+	const point = document.getElementById('point');
+	const uploadbtn = document.getElementById('uploadbtn');
+	function ables() {
+  		suby2.disabled = !review.value;
+	}
+	function ableUpload() {
+		document.getElementById('point-part').style.display = '';
+	}
+	function ableWrite() {
+  		suby3.disabled = !point.value;
+	}
+	function pointChange(point){
+		document.getElementById('bar').value = point;
+	}
+	function showReview(){
+		document.getElementById('review-part').style.display = '';
+	}
+</script>
+<script>
+function enterkey() {
+    if (window.event.keyCode == 13) {
+        searchPlaces();
+    }
+}
+	
+const searchbtn = document.getElementById('searchbtn');
+const keyword = document.getElementById('keyword');
+			
+function able() {
+  	searchbtn.disabled = !keyword.value;
+}
+</script>
+<script>
+var markers = [];
+var ps = new kakao.maps.services.Places();
+var latlng = new kakao.maps.LatLng(33.38000, 126.570667);
+	
+function searchPlaces() {
+    var keyword = document.getElementById('keyword').value;
+	axios({
+			method:'get',
+			url:'/post/search',
+			params: {
+			keyword:keyword
+			}
+		})
+		.then(function (res) {
+			const result = res.data.result;
+			if(result.length != 0){
+				var status = 'good';
+			}else{
+				var status = 'nope';
+			}
+			placesSearchCB(result, status);
+		})
+		.catch((err) => {
+		console.error(err);
+		});
+}
+	
+// 장소검색이 완료됐을 때 호출되는 콜백함수 입니다
+	
+
+var mapContainer = document.getElementById('map');
+	
+//지도 옵션
+var mapOption = { 
+    center: new kakao.maps.LatLng(33.38000, 126.570667),
+    level: 10
+};
+	
+//지도 생성
+var map = new kakao.maps.Map(mapContainer, mapOption);
+	
+if (navigator.geolocation) {
+    // GeoLocation을 이용해서 접속 위치를 얻어옵니다
+    navigator.geolocation.getCurrentPosition(function(position) {
+        
+    var lat = position.coords.latitude; // 위도
+    var lon = position.coords.longitude;// 경도
+		
+	axios({
+			method:'get',
+			url:'/post/around',
+			params: {
+			x:lon,
+			y:lat
+			}
+		})
+		.then(function (res) {
+			const result = res.data.result;
+			if(result.length != 0){
+				var el =[];
+				for(var j=0;j<result.length;j++){
+				var x = result[j].x;
+				var y = result[j].y;
+				var title = "'" + result[j].label + "'";
+				var road_address = "'" + result[j].road_address + "'";
+				var id = result[j].id;
+
+				var itemStr = '<div class="info" onclick="posit('+ x + ',' + y + ',' + title + ',' + road_address + ',' + id + ')">' +  '<h5>' + result[j].label + '</h5>';
+				itemStr += '<div class="street">' + result[j].road_address + '</div>';
+				itemStr += '<div class="tel">' + result[j].phone  + '</div>' +
+							 '</div>';           
+				el += itemStr
+			}
+			document.getElementById('placesList').innerHTML = '<h1>내 주변 카페</h1>' + el;
+			}
+		})
+		.catch((err) => {
+		console.error(err);
+		});
+
+    });
+}
+	
+function placesSearchCB(data, status) {
+    if (status === 'good') {
+		var el =[];
+		for (var i = 0; i < markers.length; i++) {
+        	markers[i].setMap(null);
+    	}
+		for(var j=0;j<data.length;j++){
+			var x = data[j].x;
+			var y = data[j].y;
+			var title = "'" + data[j].label + "'";
+			var road_address = "'" + data[j].road_address + "'";
+			var id = data[j].id;
+			
+			posi(x,y,title);
+			
+			var itemStr = '<div class="info" onclick="posit('+ x + ',' + y + ',' + title + ',' + road_address + ',' + id + ')">' +  '<h5>' + data[j].label + '</h5>';
+			itemStr += '<div class="street">' + data[j].road_address + '</div>';
+			itemStr += '<div class="tel">' + data[j].phone  + '</div>' +
+						 '</div>';           
+			el += itemStr
+		}
+		document.getElementById('placesList').style.display = '';
+		document.getElementById('placesList').innerHTML = el;
+		
+		var markerPosition = new kakao.maps.LatLng(data[0].y, data[0].x);
+		map.setCenter(markerPosition);
+		map.setLevel(7);
+		
+    } else if (status === 'nope') {
+        alert('검색 결과가 존재하지 않습니다.');
+        return;
+    } else if (status === 'error') {
+        alert('검색 결과 중 오류가 발생했습니다.');
+        return;
+    }
+}
+	
+function posi(x,y,title){
+	var position = new kakao.maps.LatLng(y, x);
+	var src = "https://millim.s3.ap-northeast-2.amazonaws.com/emotion/dislike.png";
+	
+	addMarker(position, title, src);
+}
+	
+function posit(x,y,title,road_address, id){
+	var position = new kakao.maps.LatLng(y, x);
+	var src = "https://millim.s3.ap-northeast-2.amazonaws.com/emotion/like.png";
+	
+	for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    } 
+	
+	document.getElementById('search-part').style.display = 'none';
+	document.getElementById('upload-part').style.display = '';
+	document.getElementById('keyword').value = null;
+	document.getElementById('shopId').value = id;
+	document.getElementById('selectedInfo').innerHTML = "<div class='selected-title'>" + title + "</div>" + "<div class='selected-adress'>" + "</div>"  +  road_address;
+	
+	addMarker(position, title, src);
+}
+
+function addMarker(position, title,src){
+	
+	 var imageSize = new kakao.maps.Size(30, 30); 
+     var markerImage = new kakao.maps.MarkerImage(src, imageSize);
+	
+	 var marker = new kakao.maps.Marker({
+        map: map, // 마커를 표시할 지도
+        position: position, // 마커의 위치
+		image : markerImage
+    });
+	markers.push(marker);
+	
+	document.getElementById('placesList').style.display = 'none';
+	
+	var infowindow = new kakao.maps.InfoWindow({ content: title });
+	kakao.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
+    kakao.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
+
+}
+
+function makeOverListener(map, marker, infowindow) {
+	return function() {
+		infowindow.open(map, marker);
+	};
+}
+
+function makeOutListener(infowindow) {
+	return function() {
+		infowindow.close();
+	};
+}
+</script>
+{% endblock %}

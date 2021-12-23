@@ -1,0 +1,193 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div>
+	
+</div>
+	<div class="feed-container">
+	{% if not user %}
+		<div id="loginn">
+		<a id="kakao" href="/auth/kakao">
+			<div id="share">
+				<button type="button" onClick="sendLinkDefault();" >카카오 로그인 ( Click! )</button>
+			</div>
+		</a>
+		</div>
+	{% endif %}
+	{% if user %}
+			<div id="testt"></div>
+			{% for Post in post %}
+			<div class="feed">
+				<div class="feed_header">
+					<div class="user">
+					<img src="{{Post.User.profileImg}}" onclick="location.href='/user?i={{Post.UserId}}'">
+			        <div class="feed_header_user-info">
+						<h1 onclick="location.href='/user?i={{Post.UserId}}'">{{Post.User.nick}}</h1>
+						<p class="where-feed" onclick="location.href='/shop?i={{Post.Shop.id}}'">
+							{{Post.Shop.label}}
+						</p>
+					</div>
+					
+				</div>
+					
+					<div class="more"><i  onclick="location.href='/post?i={{Post.id}}'" class="fas fa-arrow-right  small gray"></i>
+						<!--<i class="fas fa-ellipsis-h fa-sm" onclick="moreThing();"></i>-->
+					</div>
+					
+				</div>
+				<div class="moreContext" id="moreContext" style="display:none;">
+					<div class="click-part">
+						<p style="color:red;" onclick="warn()">신고</p>
+						<p onclick="link()">링크 복사</p>
+						<p style="border-bottom:none;" onclick="unfollow()">팔로우 취소</p>
+					</div>
+					<div class="back-part">
+						<p onclick="back()">취소</p>
+					</div>
+				</div>
+
+			    <div class="feed_album"  style="width:100%;position:relative">
+					<div class="feed_album_center">
+						<div class="feed_img">
+						{% if not Post.Liker.includes(user.id) %} 
+						{% for Pimg in Post.Pimgs %}
+						<img src="{{Pimg.src}}" class="mySlides{{Post.id}}" ondblclick="liking({{Post.id}})">
+						{% endfor %}
+						{% else %}
+						{% for Pimg in Post.Pimgs %}
+						<img src="{{Pimg.src}}" class="mySlides{{Post.id}}" ondblclick="disliking({{Post.id}})">
+						{% endfor %}
+						{% endif %}
+					</div>
+					</div>
+					
+					{% if Post.Pimgs.length != 1%}
+					<a class="w3-btn-floating" style=" cursor:pointer; position:absolute;top:45%; color :white;font-size:40px;left:0" onclick="plusDivs(-1,{{Post.id}})">❮</a>
+<a class="w3-btn-floating" style="cursor:pointer; position:absolute;top:45%;font-size:40px; color :white; right:0" onclick="plusDivs(1,{{Post.id}})">❯</a>
+					{% endif %}
+				</div>
+				
+				<div class="btn-container">
+					<div class="like small-img">
+						{% if not Post.Liker.includes(user.id) %} 
+							<img src="https://millim.s3.ap-northeast-2.amazonaws.com/emotion/dislike.png" onclick='liking({{Post.id}})'>
+						{% else %}
+							<img src="https://millim.s3.ap-northeast-2.amazonaws.com/emotion/like.png" onclick='disliking({{Post.id}})'>
+						{% endif %}
+					</div>
+					<div class="emtion">
+						{% if Post.score == 0 %}
+						<i class="fas fa-smile big black"></i>
+						{% elif Post.score == 1 %}
+						<i class="fas fa-smile big red"></i>
+						{% elif Post.score == 2 %}
+						<i class="fas fa-smile big orange"></i>
+						{% elif Post.score == 3 %}
+						<i class="fas fa-smile big yellow"></i>
+						{% elif Post.score == 4 %}
+						<i class="fas fa-smile big green"></i>
+						{% else %}
+						<i class="fas fa-smile big blue"></i>
+						{% endif %}
+						
+					</div>
+				</div>
+
+				
+
+				<div class="feed-text"id="contents{{Post.id}}"></div>
+			</div>	
+			{% endfor %}
+		{% endif %}
+		
+</div>
+
+{% endblock %}
+
+
+{% block script %}
+
+{% for Post in post %}
+<script>
+var content = "{{Post.content}}";
+	
+var pos = 0;
+while (true) {
+let foundPos = content.indexOf('&lt;br&gt;', pos);
+content = content.replace('&lt;br&gt;', '<br>');
+if (foundPos == -1) break;
+}
+getOff(content);
+
+function getOff(contents){
+	var hash = contents.replace(/#[^#\s,;]+/gm, function(tag) {
+        var tag_name = tag.replace(/#/g, "");
+        return "<a href='hash?title="+ tag_name+"'>" + tag +"</a>";
+    });
+	content = hash;
+	document.getElementById("contents{{Post.id}}").innerHTML = hash;
+}
+	
+</script>
+{% endfor %}
+
+<script>
+var slideIndex = 1;
+showDivs(slideIndex);
+
+function plusDivs(n,id) {
+  showDivs(slideIndex += n, id);
+}
+
+function showDivs(n,id) {
+  var i;
+  var x = document.getElementsByClassName(`mySlides${id}`);
+  if (n > x.length) {slideIndex = 1}    
+  if (n < 1) {slideIndex = x.length} ;
+  for (i = 0; i < x.length; i++) {
+     x[i].style.display = "none";  
+  }
+  x[slideIndex-1].style.display = "block";  
+}
+</script>
+
+<script>
+function moreThing(){
+	document.getElementById("moreContext").style.display="";
+}
+function warn(){
+	alert("신고가 완료되었습니다.");
+}
+function link(){
+	alert("링크 복사가 완료되었습니다.");
+}
+function unfollow(){
+	alert("팔로우가 취소되었습니다.");
+}
+function back(){
+	document.getElementById("moreContext").style.display="none";
+}
+</script>
+<script>
+function liking(id){
+		axios.post(`/post/${id}/like`)
+                .then(() => {
+                  window.location.reload();
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+</script>
+<script>
+function disliking(id){
+		axios.post(`/post/${id}/dislike`)
+                .then(() => {
+                  window.location.reload();
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+</script>
+{% endblock %}

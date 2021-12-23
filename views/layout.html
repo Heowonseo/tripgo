@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset= "UTF-8">
+		<title>JEJU</title>
+		<link rel="shortcut icon"  href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgyeRGMsMFkOlxTxuwU3BcBxrkYYNO_L7bc1KxKt8pYgHR_98OYkTVDsiTQxWD_KpLmY8&usqp=CAU">	
+		<link rel="stylesheet" href="/main.css">
+		<meta name="viewport" content=" user-scalable=no">
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+		<link rel="stylesheet" href="./reset.css">
+		<link rel="stylesheet" href="./style.css">
+		<link rel="stylesheet" href="./header.css">
+		<link rel="stylesheet" href="./bottom-nav.css">
+		<link rel="stylesheet" href="./icons.css">
+		<link rel="stylesheet" href="./footer.css">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous">
+		<link rel="stylesheet" href="./768-size.css">
+		<link rel="stylesheet" href="./mobile-size.css">
+		<meta name="viewport" content="width=device-width,initial-scale=1 ">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&family=Pavanam&family=Shrikhand&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+	</head>
+	
+	<body>
+		<div class="top">
+			<header class="header">
+		<div class="header-container">
+			<div  class="header-container_logo head">
+				<h1 onclick="location.href='/'">
+					CafeJeju
+				</h1>
+			</div>
+			<div  class="header-container_search head" onclick="location.href='/search'">
+				<div class="header-container_search_click">
+					<i class="fas fa-search fa-sm  " aria-hidden="true"></i><span>검색</span>
+				</div>
+				
+			</div>
+
+			
+			<div  class="header-container_my head">
+				
+				<div class="header-nav">
+					<i class="fas fa-home fa-lg" onclick="location.href='/'"></i>
+				<i class="fas fa-location-arrow fa-lg" onclick="location.href='/around'"></i>
+				<i class="fas fa-plus-circle fa-lg" onclick="location.href='/write'"></i>
+				<i class="fas fa-heart fa-lg default" onclick="location.href='/wish'"></i>
+					
+				</div><i class="fas fa-user fa-lg" onclick="location.href='/user?i={{user.id}}'"></i>
+			</div>
+		
+		</div>
+	</header>
+	</div>
+		
+		<main>
+		{% block content %}
+		{% endblock %}
+		</main>
+		
+		<div class="bottom">
+			<nav class="bottom-nav">
+				<i class="fas fa-home fa-lg" onclick="location.href='/'"></i>
+				<i class="fas fa-location-arrow fa-lg" onclick="location.href='/around'"></i>
+				<i class="fas fa-plus-circle fa-lg" onclick="location.href='/write'"></i>
+				<i class="fas fa-heart fa-lg default" onclick="location.href='/wish'"></i>
+				<i class="fas fa-search fa-lg  " onclick="location.href='/search'"></i>
+				
+			</nav>
+		</div>
+	<footer class="footer"></footer>	
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+		{% block script %}
+		{% endblock %}
+		
+	</body>
+</html>

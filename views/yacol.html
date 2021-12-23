@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset= "UTF-8">
+		<title>콜택시</title>
+		<link rel="stylesheet" href="/hapdong.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<script type="text/JavaScript" src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous">
+	</head>
+	<body>
+		<div class="yacol-top">
+			
+			<div class="yacol-top-p">
+				<i class="fas fa-home home fa-lg" onclick="location.href='/'"></i> <p class="yacol-p">
+			콜택시
+			</p>
+				<i class="fas fa-home black fa-lg" onclick="location.href='/'"></i>
+			</div>
+		</div>
+		{% if result == 'f'%}
+		<div class="yacol-body">
+			<img src="https://lamarperu.com/wp-content/uploads/2021/04/promoelantra.png">
+		</div>
+		<form action="/hapdong/yacol" method="POST" id="frm">
+			<div class="yacol-middle">
+				<input type="hidden" id="date" name="date" value="{{date}}">
+				<input type="hidden" id="month" name="month" value="{{month}}">
+				<input type="hidden" id="day" name="day" value="{{day}}">
+				<input type="hidden" id="driver" name="driver" value="{{level}} {{driver}}">
+				
+				<div id="destinationContainer">
+					<div class="destination-p">
+						<label>목적지</label>
+					</div>
+					<div class="destination-btn">	
+						<button type="button" onclick="destination(this.value)" value="선바위">선바위</button>
+						<button type="button" onclick="destination(this.value)" value="양재">양재</button>
+						<button type="button" onclick="destination(this.value)" value="기타">기타</button>
+					</div>
+					<input type="hidden" id="desti" name="desti">
+				</div>
+				<div id="kindsContainer" style="display:none;">
+					<div class="which-car">
+						<label>차종</label>
+					</div>
+					<div class="kindsContainer-button">
+						<button type="button" onclick="kindsCar(this.value)" value="모닝">모닝</button>
+					<button type="button" onclick="kindsCar(this.value)" value="아반떼">아반떼</button>
+					</div>
+					
+					<input type="hidden" id="kinds" name="kinds">
+					<div class="next-page">
+						<button type="button" onclick="prevKinds()"><i class="fas fa-chevron-circle-left fa-2x"></i></button>
+					</div>
+				</div>
+				<div id="numbersContainer" style="display:none;">
+					<label>차량 번호</label>
+					<input type="text" id="numbers" name="numbers" maxlength="4">
+					<div class="next-page">
+						<button type="button" onclick="prevNumbers()"><i class="fas fa-chevron-circle-left fa-2x"></i></button>
+						<button type="button" onclick="completeNumbers()" id="nextNumbers"><i class="fas fa-chevron-circle-right fa-2x"></i></button>
+					</div>
+				
+				</div>
+			</div>
+		</form>
+		<div class="yacol-bottom">
+			<div class="final-page" id="final" style="display:none;">
+				<div class="final-yacol">
+				<p class="box" id="result-head"></p>
+				<p class ="box" id="result-desti"></p>
+				<p class ="box" id="result-kinds"></p>
+				<p class ="box" id="result-numbers"></p>
+			</div>
+			
+			<button  type="button" id="btn" onclick="check()" style="display:none;">START<br>ENGINE</button>
+		</div>
+			</div>
+		{% else %}
+		<div class="end-page-main">
+			<div class="end-page">
+			<p class="end" style="color:white;">
+		
+			날짜 : {{dataList[0].date}}
+		</p>	
+		<p class="end">목적지 : {{dataList[1].desti}} 
+			
+			
+		</p>
+		<p class="end">
+			차종 : {{dataList[2].kinds}} 
+		</p>
+		<p class="end">
+			번호 : {{dataList[3].numbers}} 
+		</p>
+		</div>
+		<form action="/hapdong/comback" method="POST" id="frmm">
+			<input type="hidden" id="combackDay" name="combackDay" value="{{day}}">
+			<input type="hidden" name="combackDate" value="{{date}}">
+			<input type="hidden" name="combackMonth" value="{{month}}">
+			<input type="hidden" name="combackDriver" value="{{level}} {{driver}}">
+			<input type="hidden" name="combackDesti" value="{{dataList[1].desti}}">
+			<input type="hidden" name="combackKinds" value="{{dataList[2].kinds}}">
+			<input type="hidden" name="combackNumbers" value="{{dataList[3].numbers}}">
+		</form>
+		<div class="stop-button">
+			<button type="button"  onclick="checkStop()">STOP<br>ENGINE</button>
+		</div>
+		</div>
+		
+		{% endif %}
+		
+
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script>
+			document.querySelector('#kinds').addEventListener('keyup', (e)=>{
+				if (e.keyCode === 13) {
+					completeKinds();
+			  }  
+			});
+			document.querySelector('#numbers').addEventListener('keyup', (e)=>{
+				if (e.keyCode === 13) {
+					completeNumbers();
+			  }  
+			});
+		</script>
+		<script>
+			function destination(e){
+				document.getElementById('desti').value = e;
+				document.getElementById('kindsContainer').style.display = '';
+				document.getElementById('destinationContainer').style.display = 'none';
+			}
+			function kindsCar(e){
+				document.getElementById('kinds').value = e;
+				document.getElementById('kindsContainer').style.display = 'none';
+				document.getElementById('numbersContainer').style.display = '';
+			}
+		</script>
+		<script>
+			function prevKinds(){
+				document.getElementById('kindsContainer').style.display = 'none';
+				document.getElementById('destinationContainer').style.display = '';
+			}
+			function prevNumbers(){
+				document.getElementById('kindsContainer').style.display = '';
+				document.getElementById('numbersContainer').style.display = 'none';
+			}
+			function completeNumbers(){
+				var driver = document.getElementById('driver').value;
+				var kinds = document.getElementById('kinds').value;
+				var numbers = document.getElementById('numbers').value;
+				var desti = document.getElementById('desti').value;
+				if(numbers == ''){
+					alert('차량 번호를 입력하세요!');
+					return;
+				}
+				document.getElementById('numbersContainer').style.display = 'none';
+				document.getElementById('btn').style.display = '';
+				document.getElementById('final').style.display = '';
+				document.getElementById('result-head').innerHTML = driver;
+				document.getElementById('result-desti').innerHTML = '목적지 : ' + desti;
+				document.getElementById('result-kinds').innerHTML = '차종 : ' + kinds;
+				document.getElementById('result-numbers').innerHTML = '번호 : ' + numbers;
+			}
+		</script>
+		<script>
+			function check(){
+				var driver = document.getElementById('driver').value;
+				var kinds = document.getElementById('kinds').value;
+				var numbers = document.getElementById('numbers').value;
+				var desti = document.getElementById('desti').value;
+				var d = new Date().getDay();
+				var day = '';
+				if(d == 0 || d == 6){
+					day = '주말콜택시';
+				}else{
+					day = '야간콜택시';
+				}
+				if (!confirm(`${driver}\r\n${day} (${desti})\r\n${kinds}(${numbers})\r\n맞습니까?`)) {
+					return;
+				}else{
+					document.getElementById('frm').submit();
+				}
+			}
+			function checkStop(){
+				if (!confirm(`도착하셨습니까?`)) {
+					return;
+				}else{
+					document.getElementById('frmm').submit();
+				}
+			}
+		</script>
+	</body

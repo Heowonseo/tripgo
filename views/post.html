@@ -1,0 +1,242 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+
+<div class="post-container">
+	<div class="feed">
+		<div class="feed_header">
+			<div class="user">
+			<img src="{{post.User.profileImg}}" onclick="location.href='/user?i={{post.UserId}}'">
+				<div class="feed_header_user-info">
+					<h1 onclick="location.href='/user?i={{post.UserId}}'">{{post.User.nick}}</h1>
+					<p class="where-feed" id="where" onclick="location.href='/shop?i={{post.Shop.id}}'">{{post.Shop.label}}</p>
+				</div>
+		</div>
+			<div class="more">
+			
+				<i class="fas fa-ellipsis-h " onclick="moreThing();"></i>
+				
+			</div>
+		</div>
+		<div class="moreContext" id="moreContext" style="display:none;">
+			<div class="click-part">
+				<p style="color:red;" onclick="warn()">신고</p>
+				<p onclick="link()">링크 복사</p>
+				{% if user.id != post.UserId %}
+					{% if followerIdList.includes(post.UserId) %}
+				<p style="border-bottom:none;" onclick="checkUnfollow({{post.UserId}})">팔로우 취소</p>
+					{% else %}
+				<p style="border-bottom:none;" onclick="checkfollow({{post.UserId}})">팔로우</p>
+					{% endif %}
+				{% else %}
+				<p style="border-bottom:none;" onclick="checkDelete({{post.id}})">게시글 삭제</p>
+				{% endif %}
+				<input type="hidden" id="myId" value="{{user.id}}">
+			</div>
+			<div class="back-part">
+				<p onclick="back()">취소</p>
+			</div>
+		</div>
+		
+		 <div class="feed_album"  style="width:100%;position:relative">
+		<div class="feed_album_center">
+			<div class="feed_img">
+			
+			{% if not likeList.includes(user.id) %}
+			{% for Pimg in post.Pimgs%}
+			<img src="{{Pimg.src}}" ondblclick="liking({{post.id}})" class="mySlides{{post.id}}">
+			{% endfor %}
+			{% else %}
+			{% for Pimg in post.Pimgs%}
+			<img src="{{Pimg.src}}" ondblclick="disliking({{post.id}})" class="mySlides{{post.id}}">
+			{% endfor %}
+			{% endif %}
+		    </div>
+			</div>
+		{% if post.Pimgs.length != 1%}
+		<a class="w3-btn-floating"  style=" cursor:pointer; position:absolute;top:45%; color :white;font-size:40px;left:0" onclick="plusDivs(-1,{{post.id}})">❮</a>
+		<a class="w3-btn-floating" style="cursor:pointer; position:absolute;top:45%;font-size:40px; color :white; right:0" onclick="plusDivs(1,{{post.id}})">❯</a>
+		{% endif %}
+		</div>
+		<div class="btn-container">
+			<div class="like">
+				{% if not likeList.includes(user.id) %}
+					<img src="https://millim.s3.ap-northeast-2.amazonaws.com/emotion/dislike.png" onclick='liking({{post.id}})'>
+				{% else %}
+					<img src="https://millim.s3.ap-northeast-2.amazonaws.com/emotion/like.png" onclick='disliking({{post.id}})'>
+   				 {% endif %}
+			</div>
+			<div class="satisfaction">
+				{% if post.score == 0 %}
+				<i class="fas fa-smile big black"></i>
+				{% elif post.score == 1 %}
+				<i class="fas fa-smile big red"></i>
+				{% elif post.score == 2 %}
+				<i class="fas fa-smile big orange"></i>
+				{% elif post.score == 3 %}
+				<i class="fas fa-smile big yellow"></i>
+				{% elif post.score == 4 %}
+				<i class="fas fa-smile big green"></i>
+				{% else %}
+				<i class="fas fa-smile big blue"></i>
+				{% endif %}
+			</div>
+		</div>
+		<div class="feed-text" id="contents"></div>
+	</div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>	
+var content = "{{post.content}}";
+	
+let pos = 0;
+while (true) {
+let foundPos = content.indexOf('&lt;br&gt;', pos);
+content = content.replace('&lt;br&gt;', '<br>');
+if (foundPos == -1) break;
+}
+getOff(content);
+
+function getOff(contents){
+	var hash = contents.replace(/#[^#\s,;]+/gm, function(tag) {
+        var tag_name = tag.replace(/#/g, "");
+        return "<a href='hash?title="+ tag_name+"'>" + tag +"</a>";
+    });
+	content = hash;
+	$("#contents").html(hash);
+}
+	
+</script>
+<script>
+function checkUnfollow(id){
+	if (!confirm("팔로우를 취소하시겠습니까?")) {
+        return;
+    } else {
+        unfollowing(id);
+    }
+}
+function checkfollow(id){
+	if (!confirm("팔로우를 취소하시겠습니까?")) {
+        return;
+    } else {
+        following(id);
+    }
+}
+function checkDelete(id){
+	if (!confirm("게시글을 삭제하시겠습니까?")) {
+        return;
+    } else {
+        deleting(id);
+    }
+}
+</script>
+<script>
+var slideIndex = 1;
+showDivs(slideIndex);
+
+function plusDivs(n,id) {
+  showDivs(slideIndex += n, id);
+}
+
+function showDivs(n,id) {
+  var i;
+  var x = document.getElementsByClassName(`mySlides${id}`);
+  if (n > x.length) {slideIndex = 1}    
+  if (n < 1) {slideIndex = x.length} ;
+  for (i = 0; i < x.length; i++) {
+     x[i].style.display = "none";  
+  }
+  x[slideIndex-1].style.display = "block";  
+}
+</script>
+<script>
+function liking(id){
+		axios.post(`/post/${id}/like`)
+                .then(() => {
+                  window.location.reload();
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+</script>
+<script>
+function disliking(id){
+		axios.post(`/post/${id}/dislike`)
+                .then(() => {
+                  window.location.reload();
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+</script>
+<script>
+function deleting(id){
+	axios.post(`/post/${id}/delete`)
+                .then(() => {
+                 	location.href="/";
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+</script>
+<script>
+function moreThing(){
+	document.getElementById("moreContext").style.display="";
+}
+function warn(){
+	alert("신고가 완료되었습니다.");
+}
+function link(){
+	var url = window.location.href;
+	var textarea = document.createElement("textarea");
+	document.body.appendChild(textarea);
+	url = window.document.location.href;
+	textarea.value = url;
+	textarea.select();
+	document.execCommand("copy");
+	document.body.removeChild(textarea);
+	alert("URL이 복사되었습니다.");
+}
+function unfollow(){
+	alert("팔로우가 취소되었습니다.");
+}
+function back(){
+	document.getElementById("moreContext").style.display="none";
+}
+</script>
+<script>
+function following(UserId){
+	const myId = document.getElementById('myId').value;
+	if (UserId !== myId) {
+		axios.post(`/auth/${UserId}/follow`)
+                .then(() => {
+                   window.location.reload();
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+}
+</script>
+<script>
+function unfollowing(UserId){
+	const myId = document.getElementById('myId').value;
+	if (UserId !== myId) {
+		axios.post(`/auth/${UserId}/unfollow`)
+                .then(() => {
+                   window.location.reload();
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+}
+</script>
+{% endblock %}

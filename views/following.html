@@ -1,0 +1,52 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="fllow-container">
+	
+	
+	<div id="followList">
+		{% if exUser.Followings.length != 0 %}
+        {% for following in exUser.Followings %}
+          <div id="followElement">
+			  <div class="followElement-user">
+				   <img class="follow-img" src="{{following.profileImg}}">
+			  <p onclick="location.href='/user?i={{following.id}}'">{{following.nick}}</p>
+			  </div>
+			  <div class="followElement-btn">
+				  <input type="hidden" id="myId" value="{{user.id}}">
+				  <button onclick="unfollowing({{following.id}})">
+						언팔로우
+					</button>
+				<!--  <i class="fas fa-ellipsis-h fa-sm" ></i>-->
+			  </div>
+			 
+		</div>
+        {% endfor %}
+	  {% else %}
+	  	<div class="alertFollow">
+		  	<h1>
+				아직 {{user.nick}}님이 팔로우한 유저가 없어요!
+			</h1>
+		</div>
+      {% endif %}
+	</div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+function unfollowing(UserId){
+	const myId = document.getElementById('myId').value;
+	if (UserId !== myId) {
+		axios.post(`/auth/${UserId}/unfollow`)
+                .then(() => {
+                   window.location.reload();
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+}
+</script>
+{% endblock %}

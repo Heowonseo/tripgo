@@ -1,0 +1,210 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="manage-container">
+	<div class="shop-information">
+			<div class=" shop-img">
+				<img  src="{{shop.Simgs[0].src}}">
+			</div>
+
+			<div class="shop-content">
+				<div class="shop-name">
+					<h1 id="place" onclick="location.href='/shop?i={{shop.id}}'">{{shop.label}}</h1>
+					<p id="adress">{{shop.road_address}}</p>
+					<p>{{shop.phone}}</p>
+				</div>
+				<div class="button-container">
+					<button class="button" type="button">정보 수정</button>
+					<button class="button" type="button" onclick="showAddMenu()">메뉴 추가</button>
+				</div>
+			</div>
+	</div>
+	
+	<div class="add-menu" id="addMenu" style="display:none;">
+		<h1>메뉴 추가</h1>
+		<form method="POST" action="/post/addMenu" enctype="multipart/form-data">
+			<div class="img-preview"></div>
+			<input type="hidden" value="{{shop.id}}" name="shopId">
+			<input type="file" oninput="able()" name="img" id="uploadbtn" accept="image/*" multiple><br>
+			<input type="text" name="label"  id="label" placeholder="메뉴 이름" oninput="able()"><br>
+			<input type="number" name="price" id="price" placeholder="가격" oninput="able()"><br>
+			<textarea name="description" id="description" placeholder="설명" oninput="able()"></textarea><br>
+			<button type="submit" id="btn" disabled>입력완료</button>
+		</form>
+	</div>
+	
+	<h1 class="menu-set">MENU</h1>
+	<div class="edit-menu">
+		
+		{% for Menu in shop.Menus%}
+		<div class="menu-box">
+			<form class="menu-box-item" method="POST" action="/post/edit">
+			<div class="menu-box-img">	<img src="{{Menu.src}}">
+			</div>
+		<div class="menu-box-info">
+			<div class="menu-id-name">
+				<input type="hidden" name="shopId"id="shopShowId"  value="{{shop.id}}"><input type="hidden" name="menuId" id="showId" value="{{Menu.id}}">
+			<input type="text" name="showLabel" id="showLabel{{Menu.id}}" value="{{Menu.label}}" readonly>
+			</div>
+			
+
+			<textarea id="showDes{{Menu.id}}" name="showDes" readonly>{{Menu.description}}</textarea>
+			
+			<div class="menu-price">
+				<input type="number" name="showPrice" id="showPrice{{Menu.id}}" value="{{Menu.price}}" readonly><p>
+				원
+				</p>
+			</div>
+		</div>
+			
+				<div class="btnContainer-menu-box" id="btnContainer{{Menu.id}}">
+					<button type="button" onclick="editLabel({{Menu.id}})">수정</button>
+					<button type="button" onclick="deleteMenu({{Menu.id}})">삭제</button>
+				</div>
+				<button id="submitBtn{{Menu.id}}" type="submit" style="display:none;">수정 완료</button>
+			</form>
+	</div>
+		{% endfor %}
+		
+	</div>
+	<div class="order-view">
+		<table>
+			<tr>
+				<td>닉네임</td>
+				<td>휴대폰 번호</td>
+				<td>주문내역</td>
+				<td>예상 도착시간</td>
+				<td>비고</td>
+			</tr>
+			{% for Order in order %}
+			<tr>
+				<td>{{Order.nick}}</td>
+				<td>{{Order.phone}}</td>
+				<td>{{Order.order}}</td>
+				<td>{{Order.arrive}}</td>
+				<td></td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+function editLabel(a){
+	document.getElementById('showLabel' + a).readOnly = false;
+	document.getElementById('showLabel' + a).style.border ="1px solid black";
+	editPrice(a);
+}
+function editPrice(a){
+	document.getElementById('showPrice' + a).readOnly = false;
+	document.getElementById('showPrice' + a).style.border ="1px solid black";
+	editDes(a);
+}
+function editDes(a){
+	document.getElementById('showDes' + a).readOnly = false;
+	document.getElementById('showDes' + a).style.border ="1px solid black";
+	document.getElementById("btnContainer" + a).style.display='none';
+	document.getElementById("submitBtn" + a).style.display='';
+	return;
+}
+</script>
+<script>
+var x = 0;
+function showAddMenu(){
+	if(x == 0){
+		document.getElementById("addMenu").style.display='';
+		x = 1;
+	}else{
+		document.getElementById("addMenu").style.display='none';
+		x = 0;
+	}
+	return;
+}
+</script>
+<script>
+     if (document.getElementById("uploadbtn")) {
+  let uploadNum = 0; //올린 사진 셀 변수
+  let index = 0; //img 에 붙일 index
+  document.getElementById("uploadbtn").addEventListener("change", function (e) {
+    const formData = new FormData(); //서버로 보낼 이미지 form
+    const length = this.files.length;
+    const max = 5; //사진 최대 5장까지
+    switch (uploadNum) {
+      case 0:
+        if (length > max - uploadNum) {
+          alert("사진은 최대 5장까지만 가능합니다.");
+          return;
+        }
+        uploadNum += length;
+        break;
+      case 1:
+        if (length > max - uploadNum) {
+          alert("사진은 최대 5장까지만 가능합니다.");
+          return;
+        }
+        uploadNum += length;
+        break;
+      case 2:
+        if (length > max - uploadNum) {
+          alert("사진은 최대 5장까지만 가능합니다.");
+          return;
+        }
+        uploadNum += length;
+        break;
+      case 3:
+        if (length > max - uploadNum) {
+          alert("사진은 최대 5장까지만 가능합니다.");
+          return;
+        }
+        uploadNum += length;
+        break;
+	  case 4:
+        if (length > max - uploadNum) {
+          alert("사진은 최대 5장까지만 가능합니다.");
+          return;
+        }
+        uploadNum += length;
+        break;
+      default:
+        alert("사진은 최대 5장까지만 가능합니다.");
+        return;
+    }
+    console.log("업로드한 사진 : ", uploadNum);
+    console.log("현재 올린 사진 : ", this.files);
+    for (let i = 0; i < length; i++) {
+      formData.append("img", this.files[i]);
+      index++;
+    }
+    axios.post("/post/img", formData).then((res) => {
+      let url = JSON.parse(res.data);
+      console.log(url);
+      let img_html = "";
+      for (let i = 0; i < url.length; i++) {
+        console.log("미리보기", url[i]);
+         img_html += `<div class="img-preview${index}">
+                  <img id="img-preview${index}" src="${url[i]}" width="250" alt="미리보기">
+				  <input id="img-url" type="hidden" name="url" value="${url[i]}">
+                  </div>`;
+        console.log("json 길이 : ", url.length);
+        console.log("서버통신index:", index);
+        console.log(img_html);
+      }
+      $(".img-preview").append(img_html);
+    });
+  });
+}
+</script>
+<script>
+	const uploadbtn = document.getElementById('uploadbtn');
+	const label = document.getElementById('label');
+	const price = document.getElementById('price');
+	const description = document.getElementById('description');
+	const btn = document.getElementById('btn');
+	function able() {
+  	btn.disabled = !uploadbtn.value || !label.value || !price.value || !description.value ;
+	}
+</script>
+{% endblock %}

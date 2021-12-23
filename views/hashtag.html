@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="shop">
+	<div class="shop-container">
+		<div class="hashtag-query">
+			<h1>#{{hashtag.title}}</h1>
+		</div>
+		<div class="userPage_body">
+			{% for Post in hashtag.Posts %}
+				{% for Pimg in Post.Pimgs %}
+				<img src="{{Pimg.src}}" onclick="location.href='/post?i={{Post.id}}'">
+				{% endfor %}
+			{% endfor %}
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+
+{% endblock %}

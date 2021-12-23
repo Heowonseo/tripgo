@@ -1,0 +1,48 @@
+.bottom{
+	 z-index:1;
+	display:none;
+	justify-content:center;
+	align-items:center;
+width: 100%;
+height: 45px;
+background: whitesmoke;
+	position:fixed;
+	bottom:0;
+}
+
+.bottom-nav{
+	width:740px;
+	display:flex;
+	justify-content:space-between;
+	color:#FA8316; 
+	
+}
+
+.default{
+	color:#FA8316;
+}
+
+@media (max-width:450px){
+	
+	.bottom{
+		display:flex;
+		background:white;
+		width:100%;
+		height: 45px;
+	}
+	.bottom-nav{
+	
+	margin:0px 5%;
+	width:100%;
+	display:flex;
+	justify-content:space-between;
+	color:#FA8316; 
+	
+}
+	
+	
+	/*cursor:pointer;*/
+	
+	.cursor{
+		cursor:pointer;
+	}

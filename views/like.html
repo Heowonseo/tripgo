@@ -1,0 +1,110 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="wish-container">
+	<div id="map"></div>
+	<div class="wish-completed">
+		<h1>visited</h1>
+		<div class="wish-completed-container">
+			{% for Shop in exUser.Interester %}
+				{% if Shop.idList.includes(user.id)%}
+				{% for Simg in Shop.Simgs %}
+					<img src="{{Simg.src}}" onclick="location.href='/shop?i={{Shop.id}}'" >
+				{% endfor %}
+				{%endif%}
+			{% endfor %}
+		</div>
+	</div>
+	<div class="wish-yet">
+		<h1>wish list</h1>
+		<div class="wish-yet-container">
+			{% for Shop in exUser.Interester %}
+				{% if not Shop.idList.includes(user.id)%}
+				{% for Simg in Shop.Simgs %}
+					<img src="{{Simg.src}}" onclick="location.href='/shop?i={{Shop.id}}'">
+				{% endfor %}
+				{%endif%}
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d5551822d523c32a727c9565bfcb3814&libraries=services"></script>
+{% endblock %}
+
+
+{% block script %}
+<script>
+var mapContainer = document.getElementById('map');
+	
+//지도 옵션
+var mapOption = { 
+    center: new kakao.maps.LatLng(33.38000, 126.570667),
+    level: 10
+};
+	
+//지도 생성
+var map = new kakao.maps.Map(mapContainer, mapOption);
+var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+var LikeMarkers = [];
+	
+{% for Shop in exUser.Interester %}
+{% if Shop.idList.includes(user.id)%}
+displayLikePlaces({{Shop.x}}, {{Shop.y}}, '{{Shop.label}}');
+{% else %}
+displayUnLikePlaces({{Shop.x}}, {{Shop.y}}, '{{Shop.label}}');
+{% endif %}
+{% endfor %}
+
+
+function displayLikePlaces(x, y, title){
+	//이미지 주소
+	var imageSrc = "https://millim.s3.ap-northeast-2.amazonaws.com/emotion/like.png";
+	var imageSize = new kakao.maps.Size(30, 30); 
+    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+	//마커 좌표	
+	var position  = new kakao.maps.LatLng(y, x);
+
+
+	var marker = new kakao.maps.Marker({
+		map: map, // 마커를 표시할 지도
+		position: position,// 마커의 위치
+		image : markerImage//마커의 이미지
+	});
+	var infowindow = new kakao.maps.InfoWindow({ content: title });
+	kakao.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
+    kakao.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
+}
+
+function displayUnLikePlaces(x, y, title){
+	//이미지 주소
+	var imageSrc = "https://millim.s3.ap-northeast-2.amazonaws.com/emotion/dislike.png";
+	var imageSize = new kakao.maps.Size(30, 30); 
+    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+	//마커 좌표	
+	var position  = new kakao.maps.LatLng(y, x);
+	
+	var marker = new kakao.maps.Marker({
+		map: map, // 마커를 표시할 지도
+		position: position,// 마커의 위치
+		image : markerImage//마커의 이미지
+	});
+	var infowindow = new kakao.maps.InfoWindow({ content: title });
+	kakao.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
+    kakao.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
+}
+ 
+function makeOverListener(map, marker, infowindow) {
+	return function() {
+		infowindow.open(map, marker);
+	};
+}
+
+function makeOutListener(infowindow) {
+	return function() {
+		infowindow.close();
+	};
+}
+</script>
+{% endblock %}

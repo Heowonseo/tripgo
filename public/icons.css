@@ -1,0 +1,77 @@
+.like{
+	cursor:pointer;
+	color:red;
+	margin-right:1.0vh;
+}
+.fa-home{
+	cursor:pointer;
+}
+
+.fa-location-arrow{
+	cursor:pointer;
+}
+
+.fa-plus-circle{
+	cursor:pointer;
+}
+
+.fa-heart{
+	cursor:pointer;
+}
+
+.big{
+	font-size:25px;
+}
+
+.super-big{
+	font-size:75px;
+}
+
+.fa-ellipsis-h{
+	padding-right:10px;
+	cursor:pointer;
+	color:black;
+}
+.fa-arrow-right
+{
+	padding-right:10px;
+	cursor:pointer;
+	color:#FFC3B0;
+}
+
+/*color*/
+
+.green{
+	margin-right:1.0vh;
+	color:#49B454;
+}
+
+.pink{
+	color:hotpink;
+}
+
+.yellow{
+	color:#F3CD04;
+}
+
+.orange{
+	color:#FA8316;
+}
+.gray{
+	color:#969699;
+}
+
+.blue{
+	color:#3A56EB;
+}
+
+.red{
+	color:red;
+}
+.white{
+	color:white;
+}
+.black{
+	color:black;
+}
+

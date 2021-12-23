@@ -1,0 +1,178 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="userpage">
+	<div class="user-container">
+	{% if user %}
+		<input type="hidden" id="followed" value="{{exUser.id}}">
+		<input type="hidden" id="myId" value="{{user.id}}">
+		<div class="userPage_header">
+			<div class="userPage_header-img">
+				<img src="{{exUser.profileImg}}">
+			</div>
+			<div class="user-infomation">
+				<div class="user-id">	
+					<h1>
+						{{exUser.nick}}
+					</h1>
+						{% if user.id != exUser.id %}
+							{% if not followerIdList.includes(exUser.id) %}
+								<button onclick="following()" >팔로우</button>
+							{% else %}
+								<button onclick="unfollowing()" >언팔로우</button>
+							{% endif %}
+						{% endif %}
+				</div>	
+				<div class="userPage_num">
+				<div class="posts-num">
+					<p>
+						게시물
+					</p>
+					<p class="bold">
+						{{post.length}}
+					</p>
+				</div>
+				<div class="posts-num" onclick="location.href='/follower?i={{exUser.id}}'">
+					<p>
+						팔로워
+					</p>
+					<p class="bold">
+						{% if exUser.Followers %}
+						{{exUser.Followers.length}}
+						{% else %}
+						0
+						{% endif %}
+					</p>
+				</div>
+				<div class="posts-num" onclick="location.href='/following?i={{exUser.id}}'">
+					<p>
+						팔로잉
+					</p>
+					<p class="bold">
+						{% if exUser.Followings %}
+						{{exUser.Followings.length}}
+						{% else %}
+						0
+						{% endif %}
+					</p>
+				</div>
+			</div>
+				<div class="userPage_text">
+					<p>
+						저는 카리나에요
+					</p>
+					<a href="https://tripple.run.goorm.io/shop?i=1">https://tripple.run.goorm.io/shop?i=1</a>
+				</div>
+			</div>
+
+
+
+		</div>
+
+		<div class="userPage_body">
+			{% for Post in post %}
+				{% for Pimg in Post.Pimgs %}
+				<img src="{{Pimg.src}}" onclick="location.href='/post?i={{Post.id}}'">
+				{% endfor %}
+			{% endfor %}
+		</div>
+	{% else %}
+		<div class="userPage_header">
+			<div class="userPage_header-img">
+				<img src="https://pbs.twimg.com/media/E3GwIkdVcAAYGiW.jpg">
+			</div>
+			<div class="user-infomation">
+				<div class="user-id">	
+			<h1>
+				karina4967
+			</h1>
+					<button >
+						팔로우
+					</button>
+		</div>	
+				<div class="userPage_num">
+				<div class="posts-num">
+					<p>
+						게시물
+					</p>
+					<p class="bold">
+						30
+					</p>
+				</div>
+				<div class="posts-num">
+					<p>
+						팔로워
+					</p>
+					<p class="bold">
+						153
+					</p>
+				</div>
+				<div class="posts-num">
+					<p>
+						팔로잉
+					</p>
+					<p class="bold">
+						123
+					</p>
+				</div>
+			</div>
+				<div class="userPage_text">
+					<p>
+						저는 카리나에요 https://tripple.run.goorm.io/user
+					</p>
+				</div>
+			</div>
+
+
+
+		</div>
+
+		<div class="userPage_body">
+			<img src="https://img7.yna.co.kr/etc/inner/KR/2020/08/30/AKR20200830030851004_01_i_P4.jpg" onclick="location.href='/post'">
+			<img src="http://mnews.imaeil.com/inc/photos/2021/04/13/2021041315034145068_l.jpg" onclick="location.href='/post'">
+			<img src="http://www.outdoornews.co.kr/news/photo/201905/31058_85370_2048.jpg" onclick="location.href='/post'">
+			<img src="https://www.mstoday.co.kr/news/photo/202010/62714_44329_4439.jpeg" onclick="location.href='/post'">
+			<img src="https://img7.yna.co.kr/etc/inner/KR/2020/08/30/AKR20200830030851004_01_i_P4.jpg" onclick="location.href='/post'">
+			<img src="http://mnews.imaeil.com/inc/photos/2021/04/13/2021041315034145068_l.jpg" onclick="location.href='/post'">
+			<img src="http://www.outdoornews.co.kr/news/photo/201905/31058_85370_2048.jpg" onclick="location.href='/post'">
+			<img src="https://www.mstoday.co.kr/news/photo/202010/62714_44329_4439.jpeg" onclick="location.href='/post'">
+	</div>
+	{%endif%}
+</div>
+</div>
+
+{% endblock %}
+
+
+{% block script %}
+<script>
+function following(){
+	const UserId = document.getElementById('followed').value;
+	const myId = document.getElementById('myId').value;
+	if (UserId !== myId) {
+		axios.post(`/auth/${UserId}/follow`)
+                .then(() => {
+                   window.location.reload();
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+}
+</script>
+<script>
+function unfollowing(){
+	const UserId = document.getElementById('followed').value;
+	const myId = document.getElementById('myId').value;
+	if (UserId !== myId) {
+		axios.post(`/auth/${UserId}/unfollow`)
+                .then(() => {
+                   window.location.reload();
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+}
+</script>
+{% endblock %}

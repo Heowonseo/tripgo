@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset= "UTF-8">
+		<title>내 정보</title>
+		<link rel="stylesheet" href="/hapdong.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script type="text/JavaScript" src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+	</head>
+	<body class='infobody'>
+		<div class="info-head">
+			<h1 class="Create-Account">정보 입력</h1>
+		</div>
+		
+		<form action="/hapdong/on" method="POST" id="frm-info">
+			<input id="level" name="level" placeholder="계급">
+			<input id="driver-log" name="driver" placeholder="이름">
+			<button type="button" onclick="check()">완료</button>
+		</form>
+		<script>
+			document.querySelector('#level').addEventListener('keyup', (e)=>{
+				if (e.keyCode === 13) {
+					check();
+			  }  
+			});
+			document.querySelector('#driver-log').addEventListener('keyup', (e)=>{
+				if (e.keyCode === 13) {
+					check();
+			  }  
+			});
+		</script>
+		<script>
+			function check(){
+				const driver = document.getElementById('driver-log').value;
+				const level = document.getElementById('level').value;
+				if(!driver){
+					alert('이름을 입력해주세요.');
+					document.getElementById('driver').focus();
+					return;
+				}else if(!level){
+					alert('계급을 입력해주세요.');
+					document.getElementById('level').focus();
+					return;
+				}else{
+				if (!confirm(`${level} ${driver}, 맞습니까?`)) {
+					return;
+				}else{
+					document.getElementById('frm-info').submit();
+				}
+				}
+			}
+		</script>
+	</body>

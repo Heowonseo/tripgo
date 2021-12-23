@@ -1,0 +1,131 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="shop">
+	<div class="shop-container">
+		<input type="hidden" id="y" value="{{shop.y}}">
+		<input type="hidden" id="x" value="{{shop.x}}">
+
+		<div id="map"></div>
+		<div class="shop-information">
+			<div class=" shop-img">
+				<img  src="{{shop.Simgs[0].src}}">
+			</div>
+
+			<div class="shop-content">
+				<div class="shop-name">
+					<h1 id="place">{{shop.label}}</h1>
+					<p id="adress"></p>
+					<p>{{shop.phone}}</p>
+					<div class="shop-score">
+					{% if point.level == -1 %}
+					<i class="fas fa-meh super-big  gray"></i>
+					{% elif point.level == 0 %}
+					<i class="fas fa-angry super-big  black"></i>
+					{% elif point.level == 1 %}
+					<i class="fas fa-frown super-big red"></i>
+					{% elif point.level == 2 %}
+					<i class="fas fa-meh super-big  orange"></i>
+					{% elif point.level == 3 %}
+					<i class="fas fa-smile super-big  yellow"></i>
+					{% elif point.level == 4 %}
+					<i class="fas fa-laugh super-big  green"></i>
+					{% else %}
+					<i class="fas fa-grin-stars super-big blue"></i>
+					{% endif %}
+					<p>평점: {{point.point}}점</p>
+					</div>
+					
+			
+				</div>
+				{% if not interestList.includes(user.id) %}
+				<div class="button-container">
+					<button class="button" type="button" onclick="location.href='/order?id={{shop.id}}&point={{point.point}}&level={{point.level}}'">미리 주문하기</button>
+				<button class="button" type="button" onclick="interest({{shop.id}})">관심목록 추가</button>
+				</div>
+				{% else %}
+				<div class="button-container">
+				<button class="button" type="button" onclick="location.href='/order?id={{shop.id}}&point={{point.point}}&level={{point.level}}'">미리 주문하기</button>
+					<button class="button" type="button" onclick="disinterest({{shop.id}})">관심목록 제외</button>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+		<div class="userPage_body">
+			{% for Post in shoppenId %}
+				{% for Pimg in Post.Pimgs %}
+				<img src="{{Pimg.src}}" onclick="location.href='/post?i={{Post.id}}'">
+				{% endfor %}
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d5551822d523c32a727c9565bfcb3814&libraries=services"></script>
+{% endblock %}
+
+
+{% block script %}
+<script>
+var y = document.getElementById('y').value;
+var x = document.getElementById('x').value;
+	
+var mapContainer = document.getElementById('map');
+var geocoder = new kakao.maps.services.Geocoder();
+	
+//지도 옵션
+var mapOption = { 
+    center: new kakao.maps.LatLng(y, x),
+    level:2
+};
+	
+//지도 생성
+var map = new kakao.maps.Map(mapContainer, mapOption);
+	
+//마커 좌표	
+	
+var imageSrc = "https://millim.s3.ap-northeast-2.amazonaws.com/emotion/like.png";
+var imageSize = new kakao.maps.Size(30, 30); 
+var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+	
+var markerPosition  = new kakao.maps.LatLng(y, x);
+var marker = new kakao.maps.Marker({
+    position: markerPosition,
+	image : markerImage
+});
+
+//마커 표시
+marker.setMap(map);
+geocoder.coord2Address(markerPosition.getLng(), markerPosition.getLat(), function(result, status) {
+    if (status === kakao.maps.services.Status.OK) {
+        document.getElementById('adress').innerHTML = result[0].road_address.address_name + "<br>(" + result[0].address.address_name + ")";
+    }
+});
+
+	
+</script>
+<script>
+function interest(id){
+		axios.post(`/post/${id}/interest`)
+                .then(() => {
+                  window.location.reload();
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+</script>
+<script>
+function disinterest(id){
+		axios.post(`/post/${id}/disinterest`)
+                .then(() => {
+                  window.location.reload();
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+}
+</script>
+{% endblock %}

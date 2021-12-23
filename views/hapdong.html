@@ -1,0 +1,214 @@
+<html>
+	<head>
+		<meta charset= "UTF-8">
+		<title>합동신청</title>
+		<link rel="stylesheet" href="/hapdong.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<script type="text/JavaScript" src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous">
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	</head>
+	<body>
+		<div class="hapdong-container">
+			<div class="hapdong-top">
+				
+				<p class="hapdong-top-p">
+					<i class="fas fa-home fa-lg" onclick="location.href='/'"></i>합동<i class="fas fa-home fa-lg black" onclick="location.href='/'"></i>
+				</p>
+			</div>
+			<div class="hapdong-mid">
+				<div class="hapdong-circle">
+					<i class="fas fa-bus"></i>
+				</div>
+			</div>
+			<form method="POST" action="/hapdong/apply"  id="frm">
+			<div class="hapdong-bottom">
+					<label>날짜</label>
+					<input type="text" id="date" name="date" value="{{date}}" readonly>
+				
+					<label>출/퇴근</label>
+					<div class="commute-button">
+						<button type="button" id="gtw" onclick="wheny(this.value)" value="출근">출근</button>
+						<button type="button" id="off" onclick="wheny(this.value)" value="퇴근">퇴근</button>
+						<input type="hidden" id="when" name="when" oninput="able()">
+					</div>
+					<label>목적지</label>
+					<select id="emptyOption" onclick="alert('출/퇴근을 선택하세요!');"  style="width:100%;height:40px;opacity:0.7;">
+					</select>
+				
+					<select id="gtwDesti" style="display:none; width:100%;height:40px;opacity:0.7;" onchange="desti(this.value)">
+						<option value="거여(06:40)">거여(06:40)</option>
+						<option value="양재(06:50)">양재(06:50)</option>
+					</select>
+					<select id="offDesti" style="display:none;width:100%;height:40px;opacity:0.7;" onchange="desti(this.value)">
+						<option value="위례 1호차(16:50)">위례 1호차(16:50)</option>
+						<option value="위례 2호차(17:10)">위례 2호차(17:10)</option>
+						<option value="위례 3호차(18:00)">위례 3호차(18:00)</option>
+						<option value="위례 4호차(20:00)">위례 4호차(20:00)</option>
+						<option value="안양 1호차(16:50)">안양 1호차(16:50)</option>
+						<option value="안양 2호차(17:10)">안양 2호차(17:10)</option>
+						<option value="안양 3호차(20:00)">안양 3호차(20:00)</option>
+						<option value="서빙고 1호차(16:50)">서빙고 1호차(16:50)</option>
+						<option value="서빙고 2호차(18:00)">서빙고 2호차(18:00)</option>
+						<option value="양재 1호차(16:50)">양재 1호차(16:50)</option>
+						<option value="양재 2호차(17:10)">양재 2호차(17:10)</option>
+					</select>
+					<input type="hidden" id="schedule" name="schedule" oninput="able()">
+					<label>운행자</label>
+					<input type="text" id="driver" name="driver" oninput="able()" value="{{level}} {{driver}}">
+					<label>합동 신청자</label>
+					<input type="text" id="applicant" name="applicant" oninput="able()" value="{{level}} {{driver}}">
+					<button class="shinchung" type="button" id="btn" onclick="check()" disabled>신청</button>
+				<a class="delete-a" onclick="showDeleteBox()"><u>취소하기</u></a>
+			</div>
+			</form>
+			<div class="hapdong-delete" id="deleteBox" style="display:none;">
+					<div class="hapdong-delete-label">
+						<label>날짜</label>
+						<input type="text" id="datee" name="datee" value="{{date}}" readonly>
+						<label>출/퇴근</label>
+						<div class="commute-button">
+							<button type="button" id="gtww" onclick="whenyy(this.value)" value="출근">출근</button>
+							<button type="button" id="offf" onclick="whenyy(this.value)" value="퇴근">퇴근</button>
+							<input type="hidden" id="wheny" name="wheny">
+						</div>
+						<label>목적지</label>
+						<select id="emptyOptionn" style="display:none;width:100%;height:40px;" onclick="alert('출/퇴근을 선택하세요!');">
+						</select>
+						<select id="gtwDestii" style="width:100%;height:40px;"onchange="destii(this.value)">
+							<option value="거여(06:40)">거여(06:40)</option>
+							<option value="양재(06:50)">양재(06:50)</option>
+						</select>
+						<select id="offDestii" style="display:none;width:100%;height:40px;" onchange="destii(this.value)">
+							<option value="위례 1호차(16:50)">위례 1호차(16:50)</option>
+							<option value="위례 2호차(17:10)">위례 2호차(17:10)</option>
+							<option value="위례 3호차(18:00)">위례 3호차(18:00)</option>
+							<option value="위례 4호차(20:00)">위례 4호차(20:00)</option>
+							<option value="안양 1호차(16:50)">안양 1호차(16:50)</option>
+							<option value="안양 2호차(17:10)">안양 2호차(17:10)</option>
+							<option value="안양 3호차(20:00)">안양 3호차(20:00)</option>
+							<option value="서빙고 1호차(16:50)">서빙고 1호차(16:50)</option>
+							<option value="서빙고 2호차(18:00)">서빙고 2호차(18:00)</option>
+							<option value="양재 1호차(16:50)">양재 1호차(16:50)</option>
+							<option value="양재 2호차(17:10)">양재 2호차(17:10)</option>
+						</select><br>
+						<input type="hidden" id="schedulee" name="schedulee">
+					</div>
+					<button class="delete-button" type="button" id="dltbtn" onclick="checkDelete()" disabled>
+						취소하기
+					</button>
+				</div>
+		</div>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script>
+			document.querySelector('#driver').addEventListener('keyup', (e)=>{
+				if (e.keyCode === 13) {
+					document.getElementById('applicant').focus();
+			  }  
+			});
+		</script>
+		<script>
+			function checkDelete(){
+				const datee = document.getElementById('datee').value;
+				const wheny = document.getElementById('wheny').value;
+				const schedulee = document.getElementById('schedulee').value;
+				if (!confirm(`${datee}\r\n${wheny}\r\n${schedulee}\r\n취소 맞습니까?`)) {
+					return;
+				}else{
+					axios.post(`/hapdong/${datee}/${wheny}/${schedulee}/cancle`)
+						.then((res) => {
+							if(res.data.result=='t'){
+								alert('성공적으로 취소되었습니다.');
+								window.location.reload();
+							}else{
+								alert('신청된 합동 내역이 없습니다.');
+								return;
+							}
+						})
+						.catch((err) => {
+						  console.error(err);
+						});
+				}
+			}
+		</script>
+		<script>
+			function wheny(e){
+				document.getElementById('when').value = e;
+				if(e == '출근'){
+					document.getElementById('gtw').style.backgroundColor = '#4E4E4E';
+					document.getElementById('off').style.backgroundColor = '#1a1a1a';
+					document.getElementById('emptyOption').style.display = 'none';
+					document.getElementById('gtwDesti').style.display = '';
+					document.getElementById('offDesti').style.display = 'none';
+					document.getElementById('schedule').value = '거여(06:40)';
+				}else{
+					document.getElementById('gtw').style.backgroundColor = '#1a1a1a';
+					document.getElementById('off').style.backgroundColor = '#4E4E4E';
+					document.getElementById('emptyOption').style.display = 'none';
+					document.getElementById('gtwDesti').style.display = 'none';
+					document.getElementById('offDesti').style.display = '';
+					document.getElementById('schedule').value = '위례 1호차(16:50)';
+				}
+			}
+			
+			function whenyy(e){
+				document.getElementById('wheny').value = e;
+				if(e == '출근'){
+					document.getElementById('gtww').style.backgroundColor = '#4e4e4e';
+					document.getElementById('offf').style.backgroundColor = '#1a1a1a';
+					document.getElementById('emptyOptionn').style.display = 'none';
+					document.getElementById('gtwDestii').style.display = '';
+					document.getElementById('offDestii').style.display = 'none';
+					document.getElementById('schedulee').value = '거여(06:40)';
+					document.getElementById('dltbtn').disabled = false;
+				}else{
+					document.getElementById('gtww').style.backgroundColor = '#1a1a1a';
+					document.getElementById('offf').style.backgroundColor = '#4E4E4E';
+					document.getElementById('emptyOptionn').style.display = 'none';
+					document.getElementById('gtwDestii').style.display = 'none';
+					document.getElementById('offDestii').style.display = '';
+					document.getElementById('schedulee').value = '위례 1호차(16:50)';
+					document.getElementById('dltbtn').disabled = false;
+				}
+			}
+		</script>
+		<script>
+			function desti(e){
+				document.getElementById('schedule').value = e;
+			}
+			function destii(e){
+				document.getElementById('schedulee').value = e;
+			}
+		</script>
+		<script>
+			function check(){
+				var date = document.getElementById('date').value;
+				var schedule = document.getElementById('schedule').value;
+				var when = document.getElementById('when').value;
+				var applicant = document.getElementById('applicant').value;
+				var driver = document.getElementById('driver').value;
+				if (!confirm(`${date} ${when}\r\n${schedule}\r\n선탑 : ${applicant} \r\n운행 : ${driver}\r\n맞습니까?`)) {
+					return;
+				}else{
+					document.getElementById('frm').submit();
+				}
+			}
+		</script>
+		<script>
+			const applicant = document.getElementById('applicant');
+			const driver = document.getElementById('driver');
+			const when = document.getElementById('when');
+			const schedule = document.getElementById('schedule');
+			const btn = document.getElementById('btn');
+			function able() {
+				btn.disabled = !when.value || !schedule.value || !applicant.value || !driver.value;
+			}
+		</script>
+		<script>
+			function showDeleteBox(){
+				document.getElementById('deleteBox').style.display = '';
+				document.getElementById('deleteBox').scrollIntoView();
+			}
+		</script>
+	</body>
